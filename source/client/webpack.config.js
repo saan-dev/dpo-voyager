@@ -78,6 +78,12 @@ const apps = {
         title: "Voyager Story",
         template: "story.hbs",
     },
+    "index": {
+        name: "index",
+        entryPoint: "client/ui/story/MainView.ts",
+        title: "Index",
+        template: "index.hbs",
+    },
 };
 
 const version = childProcess.execSync("git describe --tags").toString().trim();
@@ -85,8 +91,7 @@ const analyticsId = process.env["VOYAGER_ANALYTICS_ID"];
 
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = function(env, argv)
-{
+module.exports = function (env, argv) {
     const appKey = env.app || "explorer";
     const isDevMode = argv.mode !== undefined ? argv.mode !== "production" : process.env["NODE_ENV"] !== "production";
     const isOffline = argv.offline !== undefined ? true : process.env["VOYAGER_OFFLINE"] === "true";
@@ -102,6 +107,7 @@ module.exports = function(env, argv)
             createAppConfig(apps.mini, isDevMode, isOffline),
             createAppConfig(apps.launcher, isDevMode, isOffline),
             createAppConfig(apps.story, isDevMode, isOffline),
+            createAppConfig(apps.index, isDevMode, isOffline),
         ];
     }
     else if (apps[appKey]) {
@@ -112,8 +118,7 @@ module.exports = function(env, argv)
     }
 };
 
-function createAppConfig(app, isDevMode, isOffline)
-{
+function createAppConfig(app, isDevMode, isOffline) {
     const devMode = isDevMode ? "development" : "production";
     const localTag = isOffline ? "-offline" : "";
     const appName = app.name;
@@ -193,7 +198,7 @@ function createAppConfig(app, isDevMode, isOffline)
                 isOffline: isOffline,
                 analyticsId: analyticsId,
                 element: `<${appName}></${appName}>`,
-                chunks: [ appName ],
+                chunks: [appName],
             })
         ],
 
@@ -214,7 +219,7 @@ function createAppConfig(app, isDevMode, isOffline)
                 {
                     // Transpile SCSS to CSS and concatenate (to string)
                     test: /\.scss$/,
-                    use: ["raw-loader","sass-loader"],
+                    use: ["raw-loader", "sass-loader"],
                     issuer: {
                         //include: /source\/client\/ui\/explorer/     // currently only inlining explorer css
                         and: [/source\/client\/ui\/explorer/]     // currently only inlining explorer css
@@ -224,7 +229,7 @@ function createAppConfig(app, isDevMode, isOffline)
                     // Transpile SCSS to CSS and concatenate
                     test: /\.scss$/,
                     use: /*appName === 'voyager-explorer' ? ["raw-loader","sass-loader"] :*/
-                        [         
+                        [
                             MiniCssExtractPlugin.loader,
                             "css-loader",
                             "sass-loader"
@@ -246,7 +251,7 @@ function createAppConfig(app, isDevMode, isOffline)
                     // Typescript/JSX files
                     test: /\.tsx?$/,
                     use: "ts-loader",
-		            exclude: /node_modules/,
+                    exclude: /node_modules/,
                 },
                 {
                     test: /\.hbs$/,
@@ -263,7 +268,7 @@ function createAppConfig(app, isDevMode, isOffline)
             //"../../../build/three.module.js": "THREE",  // patch to handle three jsm modules until there is a better routing option
         },
 
-        stats: {chunkModules: true, excludeModules: false }
+        stats: { chunkModules: true, excludeModules: false }
     };
 
     if (isDevMode) {
